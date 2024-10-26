@@ -1,0 +1,101 @@
+FROM ubuntu:20.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN sed -i 's@http://archive.ubuntu.com/ubuntu/@http://mirrors.aliyun.com/ubuntu/@g' /etc/apt/sources.list
+RUN echo "deb http://archive.ubuntu.com/ubuntu/ trusty main universe restricted multiverse" >>  /etc/apt/sources.list
+
+RUN apt-get update
+RUN apt-get install -y gcc make lsof tzdata perl tar wget sudo systemd ssh psmisc openssh-server vim git iproute2 zsh sqlite3 \
+    hwloc fontconfig sysstat syslog-ng net-tools python python3 libaio-dev libnuma-dev libgcrypt11-dev libncurses5 jq \
+    && sudo apt-get clean all
+RUN apt-get install -y sysv-rc-conf locales
+RUN locale-gen en_US.UTF-8
+# language-pack-zh-hans
+
+RUN echo root:sshpass | chpasswd \
+    && rm /bin/sh \
+    && ln -s /bin/bash /bin/sh \
+    #&& useradd docker && echo docker:sshpass | chpasswd \
+    && sed -i '98adocker    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers \
+    && echo "actiontech-universe    ALL=(ALL)       NOPASSWD:ALL" >> /etc/sudoers \
+    && echo "PermitRootLogin yes" >> /etc/ssh/sshd_config \
+    && echo 'UseDNS no' >> /etc/ssh/sshd_config \
+    && sed -i '56aDefaults:docker   !requiretty' /etc/sudoers \
+    && sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd \
+    && sed -i 's@\*/10 \* \* \* \* root /usr/lib64/sa/sa1 1 1@*/1 \* \* \* \* root /usr/lib64/sa/sa1 1 1@g' /etc/cron.d/sysstat \
+    && echo "export HISTTIMEFORMAT='%F %T '" >> /etc/bashrc \
+    && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+    && cp /usr/sbin/sysv-rc-conf /usr/sbin/chkconfig
+RUN localedef -i en_US -f UTF-8 en_US.UTF-8
+
+COPY * /docker-build/
+
+# install go1.17.7
+RUN wget -P /docker-build https://studygolang.com/dl/golang/go1.19.6.linux-amd64.tar.gz && \
+    tar -C /usr/local -zxf /docker-build/go1.19.6.linux-amd64.tar.gz
+ENV GOROOT /usr/local/go
+ENV GOPATH $HOME/go
+ENV PATH $PATH:$GOROOT/bin:$GOBIN
+ENV GOPROXY goproxy.cn,goproxy.io,direct
+ENV GOPRIVATE actiontech.cloud
+ENV GOINSECURE actiontech.cloud
+
+RUN apt-get install -y dos2unix
+ENV GOBIN /universe/bin
+
+
+
+
+# sudoers
+RUN apt-get install -y sudo
+RUN echo "go ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN sed -i "s/Defaults    requiretty/#Defaults    requiretty/g" /etc/sudoers
+
+
+# install git-lfs
+RUN curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash \
+    && sudo apt-get install git-lfs \
+    && git lfs install
+
+
+# install docker
+RUN echo "1"
+RUN apt-get update
+RUN apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+RUN curl -fsSL https://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+RUN add-apt-repository "deb [arch=amd64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+RUN apt-get -y update
+RUN apt-get -y install docker-ce
+COPY docker-daemon.json /etc/docker/daemon.json
+RUN systemctl enable docker
+VOLUME /universe
+RUN echo "3"
+RUN mkdir /docker-build/node
+RUN wget -P /docker-build ftp://ftpuser:ftpuser@10.186.18.90/housekeep/node-v10.13.0-linux-x64.tar.gz && \
+    tar -C /docker-build -zxf /docker-build/node-v10.13.0-linux-x64.tar.gz
+RUN mv /docker-build/node-v10.13.0-linux-x64 /docker-build/node/node-v10.13.0
+RUN rm -rf /docker-build/node-v10.13.0
+
+# git
+RUN git config --global --add safe.directory /universe
+
+# libc
+RUN apt-get install -y libc6
+RUN ln -s /lib/x86_64-linux-gnu/libc.so.6 /lib64/libc.so.6
+
+ENV PATH $PATH:/docker-build/node/node-v10.13.0/bin
+ENV NODE_PATH /docker-build/node/node-v10.13.0/lib/node_modules
+
+# add scspell
+RUN apt-get clean all
+RUN apt-get install -y python-setuptools python-argparse
+RUN wget -P /docker-build ftp://ftpuser:ftpuser@10.186.18.90/housekeep/scspell-master.tar.gz && \
+    tar -C /usr/local -zxf /docker-build/scspell-master.tar.gz
+RUN ln -s python2.7 /usr/bin/python
+RUN cd /usr/local/scspell-master/; python setup.py install
+
+RUN apt-get install -y bzip2 patchelf
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/sbin/init"]

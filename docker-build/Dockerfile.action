@@ -1,0 +1,64 @@
+FROM reg.actiontech.com/actiontech/centos:centos7
+
+RUN yum install -y wget
+RUN mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo_bak \
+    && wget http://mirrors.aliyun.com/repo/Centos-altarch-7.repo -O /etc/yum.repos.d/CentOS-Base.repo \
+    && yum makecache
+RUN sed -i.backup 's/^enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf \
+        # && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
+        # && curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo \
+        && yum clean all
+
+RUN yum install -y lsof perl tar sg3_utils wget perl-Time-HiRes perl-DBD-MySQL perl-Digest-MD5 libaio sudo psmisc openssh-server which vim git iproute zsh \
+        && yum clean all
+RUN yum install -y hwloc glibc fontconfig libpciaccess sysstat syslog-ng zstd jq
+
+RUN yum update -y sudo
+RUN echo root:sshpass | chpasswd \
+        #&& useradd docker && echo docker:sshpass | chpasswd \
+        # 使用sed工具在/etc/sudoers文件的第98行后面添加一行内容，允许docker用户在执行sudo时无需输入密码
+        && sed -i '98adocker    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers \
+        # 在/etc/sudoers文件的第56行后添加一行，指定docker用户在执行sudo命令时不需要tty（终端）
+        && sed -i '56aDefaults:docker   !requiretty' /etc/sudoers \
+        # sed在/etc/pam.d/sshd文件中替换一行内容，将session的pam_loginuid.so设置为可选，这通常用于解决一些登录问题
+        && sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd \c
+        # 使用sed工具在/etc/security/limits.d/*0-nproc.conf文件中将所有4096的限制替换为unlimited，可能是为了调整进程数限制
+        && sed -i s/4096/unlimited/g /etc/security/limits.d/*0-nproc.conf \
+        # 修改/etc/cron.d/sysstat文件，将每10分钟执行一次的sa1统计任务修改为每分钟执行一次
+        && sed -i 's@\*/10 \* \* \* \* root /usr/lib64/sa/sa1 1 1@*/1 \* \* \* \* root /usr/lib64/sa/sa1 1 1@g' /etc/cron.d/sysstat \
+        # 向/etc/bashrc文件追加一行，设置历史命令记录的时间格式为年-月-日 时:分:秒
+        && echo "export HISTTIMEFORMAT='%F %T '" >> /etc/bashrc \
+        # 将系统时区设置为亚洲/上海时区，使系统时钟与当地时间保持一致
+        && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+        # 给ping命令设置了setuid权限，使得普通用户在执行ping命令时可以使用root权限
+        && chmod u+s $(which ping) \
+        # 两条命令分别定义了中文和英文的UTF-8编码环境变量，用于支持不同的语言环境设置
+        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8 \
+        && localedef -i en_US -f UTF-8 en_US.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
+
+RUN (cd /lib/systemd/system/sysinit.target.wants/;  for i in *;  do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i;  done);  \
+        rm -f /lib/systemd/system/multi-user.target.wants/*; \
+        rm -f /etc/systemd/system/*.wants/*; \
+        rm -f /lib/systemd/system/local-fs.target.wants/*;  \
+        rm -f /lib/systemd/system/sockets.target.wants/*udev*;  \
+        rm -f /lib/systemd/system/sockets.target.wants/*initctl*;  \
+        rm -f /lib/systemd/system/basic.target.wants/*; \
+        rm -f /lib/systemd/system/anaconda.target.wants/*;
+
+RUN /usr/sbin/sshd-keygen \
+        && systemctl set-default multi-user.target \
+        && systemctl enable sshd \
+        && systemctl enable crond \
+        && systemctl enable syslog-ng \
+        && echo "" >> /lib/systemd/system/systemd-user-sessions.service \
+        && echo "[Install]" >> /lib/systemd/system/systemd-user-sessions.service \
+        && echo "WantedBy=multi-user.target" >> /lib/systemd/system/systemd-user-sessions.service \
+        && systemctl enable systemd-user-sessions
+
+RUN echo 'UseDNS no' >> /etc/ssh/sshd_config
+
+COPY * /docker-build/
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/usr/sbin/init"]

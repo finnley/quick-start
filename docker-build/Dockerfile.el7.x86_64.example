@@ -1,0 +1,56 @@
+FROM centos:centos7.9.2009
+
+RUN sed -i.backup 's/^enabled=1/enabled=0/' /etc/yum/pluginconf.d/fastestmirror.conf \
+        # && yum install -y wget \
+        && mv /etc/yum.repos.d/CentOS-Base.repo /etc/yum.repos.d/CentOS-Base.repo_bak \
+        # && wget http://mirrors.aliyun.com/repo/Centos-altarch-7.repo -O /etc/yum.repos.d/CentOS-Base.repo \
+        && curl -o  /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-altarch-7.repo \
+        && yum makecache \
+        # && curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.aliyun.com/repo/Centos-7.repo \
+        # && curl -o /etc/yum.repos.d/epel.repo http://mirrors.aliyun.com/repo/epel-7.repo \
+        && yum clean all
+
+RUN yum install -y lsof perl tar sg3_utils wget perl-Time-HiRes perl-DBD-MySQL perl-Digest-MD5 libaio sudo psmisc openssh-server which vim git iproute zsh \
+        && yum clean all
+RUN yum install -y hwloc glibc fontconfig libpciaccess sysstat syslog-ng zstd jq
+
+RUN yum update -y sudo
+RUN echo root:sshpass | chpasswd \
+        #&& useradd docker && echo docker:sshpass | chpasswd \
+        && sed -i '98adocker    ALL=(ALL)       NOPASSWD:ALL' /etc/sudoers \
+        && sed -i '56aDefaults:docker   !requiretty' /etc/sudoers \
+        && sed -i 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' /etc/pam.d/sshd \
+        && sed -i s/4096/unlimited/g /etc/security/limits.d/*0-nproc.conf \
+        && sed -i 's@\*/10 \* \* \* \* root /usr/lib64/sa/sa1 1 1@*/1 \* \* \* \* root /usr/lib64/sa/sa1 1 1@g' /etc/cron.d/sysstat \
+        && echo "export HISTTIMEFORMAT='%F %T '" >> /etc/bashrc \
+        && cp /usr/share/zoneinfo/Asia/Shanghai /etc/localtime \
+        && chmod u+s $(which ping) \
+        && localedef -i zh_CN -f UTF-8 zh_CN.UTF-8 \
+        && localedef -i en_US -f UTF-8 en_US.UTF-8
+ENV LC_ALL=zh_CN.UTF-8
+
+#RUN (cd /lib/systemd/system/sysinit.target.wants/;  for i in *;  do [ $i == systemd-tmpfiles-setup.service ] || rm -f $i;  done);  \
+#        rm -f /lib/systemd/system/multi-user.target.wants/*; \
+#        rm -f /etc/systemd/system/*.wants/*; \
+#        rm -f /lib/systemd/system/local-fs.target.wants/*;  \
+#        rm -f /lib/systemd/system/sockets.target.wants/*udev*;  \
+#        rm -f /lib/systemd/system/sockets.target.wants/*initctl*;  \
+#        rm -f /lib/systemd/system/basic.target.wants/*; \
+#        rm -f /lib/systemd/system/anaconda.target.wants/*;
+#
+#RUN /usr/sbin/sshd-keygen \
+#        && systemctl set-default multi-user.target \
+#        && systemctl enable sshd \
+#        && systemctl enable crond \
+#        && systemctl enable syslog-ng \
+#        && echo "" >> /lib/systemd/system/systemd-user-sessions.service \
+#        && echo "[Install]" >> /lib/systemd/system/systemd-user-sessions.service \
+#        && echo "WantedBy=multi-user.target" >> /lib/systemd/system/systemd-user-sessions.service \
+#        && systemctl enable systemd-user-sessions
+
+RUN echo 'UseDNS no' >> /etc/ssh/sshd_config
+
+COPY * /docker-build/
+
+VOLUME [ "/sys/fs/cgroup" ]
+CMD ["/usr/sbin/init"]

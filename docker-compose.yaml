@@ -1,0 +1,113 @@
+
+
+x-templates:
+  agent_centos7_altarch:
+    &agent_centos7_altarch
+    image: reg.einscat.com:10010/library/centos7:altarch
+    privileged: true
+    stdin_open: true
+    tty: true
+    extra_hosts:
+      - "docker-registry:10.186.18.20"
+    cap_add:
+      - ALL
+    working_dir: /opt
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+
+services:
+
+  chaos-1:
+    container_name: chaos-1
+    hostname: "chaos-1"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.1
+      chaos_net_2:
+        ipv4_address: 172.20.40.1
+    ports:
+      - "10000:10000"
+      - "18080:18080"
+      - "17001:27001"
+      - "13306:3306"
+    volumes:
+      - "~/workspace:/root/workspace"
+    <<: *agent_centos7_altarch
+
+  chaos-2:
+    container_name: chaos-2
+    hostname: "chaos-2"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.2
+      chaos_net_2:
+        ipv4_address: 172.20.40.2
+    ports:
+      - "20001:10000"
+      - "28081:18080"
+      - "27002:27001"
+      - "23306:3306"
+    volumes:
+      - "~/workspace:/root/workspace"
+    <<: *agent_centos7_altarch
+
+  chaos-3:
+    container_name: chaos-3
+    hostname: "chaos-3"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.3
+      chaos_net_2:
+        ipv4_address: 172.20.40.3
+    ports:
+      - "30001:10000"
+      - "38081:18080"
+      - "37002:27001"
+      - "33306:3306"
+    <<: *agent_centos7_altarch
+
+  chaos-4:
+    container_name: chaos-4
+    hostname: "chaos-4"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.4
+      chaos_net_2:
+        ipv4_address: 172.20.40.4
+    ports:
+      - "40001:10000"
+      - "48081:18080"
+      - "47002:27001"
+      - "43306:3306"
+    <<: *agent_centos7_altarch
+
+  chaos-5:
+    container_name: chaos-5
+    hostname: "chaos-5"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.5
+      chaos_net_2:
+        ipv4_address: 172.20.40.5
+    ports:
+      - "50001:10000"
+      - "58081:18080"
+      - "57002:27001"
+      - "53306:3306"
+    <<: *agent_centos7_altarch
+
+networks:
+  chaos_net:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.30.0/24
+          gateway: 172.20.30.254
+  chaos_net_2:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.40.0/24
+          gateway: 172.20.40.254
+

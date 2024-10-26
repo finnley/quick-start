@@ -1,0 +1,80 @@
+{
+  "centos7_x64": {
+    "enable": true,
+    "count": 5,
+    "is_take_over": true,
+    "ports": [
+      "10000:10000",
+      "13306:3306"
+    ],
+    "volumes": [
+      "/shared/components:/opt/umc/components"
+    ]
+  },
+  "centos7_altarch": {
+    "enable": true,
+    "count": 5,
+    "is_take_over": true,
+    "ports": [
+      "10000:10000",
+      "15690:5690",
+      "15700:5700"
+    ],
+    "volumes": [
+      "/Users/finnley/workspace:/root/workspace"
+    ]
+  },
+  "centos8_x64": {
+    "enable": false,
+    "count": 5,
+    "is_take_over": true,
+    "ports": [
+      "10000:10000",
+      "15690:5690",
+      "15700:5700"
+    ],
+    "volumes": [
+      "/shared/components:/opt/umc/components"
+    ]
+  },
+  "centos8_arm64": {
+    "enable": false,
+    "count": 5,
+    "is_take_over": true,
+    "ports": [
+      "10000:10000",
+      "15690:5690",
+      "15700:5700"
+    ],
+    "volumes": [
+      "/shared/components:/opt/umc/components"
+    ]
+  },
+  "ubuntu2004_x64": {
+    "enable": false,
+    "count": 5,
+    "is_take_over": true,
+    "ports": [
+      "10000:10000",
+      "15690:5690",
+      "15700:5700"
+    ],
+    "volumes": [
+      "/Users/finnley/workspace:/root/workspace",
+      "/shared/components:/opt/umc/components"
+    ]
+  },
+  "ubuntu2204_arm64": {
+    "enable": false,
+    "count": 5,
+    "is_take_over": true,
+    "ports": [
+      "10000:10000",
+      "15690:5690",
+      "15700:5700"
+    ],
+    "volumes": [
+      "/shared/components:/opt/umc/components"
+    ]
+  }
+}
