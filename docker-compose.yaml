@@ -1,4 +1,4 @@
-
+version: '3'
 
 x-templates:
   agent_centos7_altarch:
