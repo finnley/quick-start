@@ -1,0 +1,58 @@
+#!/bin/bash
+
+# 参考：https://goharbor.io/docs/2.11.0/install-config/configure-https/
+
+# Step 1: Generate a Certificate Authority Certificate
+# 生成CA证书
+openssl genrsa -out ca.key 4096
+openssl req -x509 -new -nodes -sha512 -days 3650 \
+  -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=harbor.example.com" \
+  -key ca.key \
+  -out ca.crt
+
+# Step 2: Generate a Server Certificate
+# 使用CA证书生成服务端证书
+openssl genrsa -out harbor.example.com.key 4096
+openssl req -sha512 -new \
+  -subj "/C=CN/ST=Beijing/L=Beijing/O=example/OU=Personal/CN=harbor.example.com" \
+  -key harbor.example.com.key \
+  -out harbor.example.com.csr
+
+cat > v3.ext <<-EOF
+authorityKeyIdentifier=keyid,issuer
+basicConstraints=CA:FALSE
+keyUsage = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+subjectAltName = @alt_names
+
+[alt_names]
+DNS.1=harbor.example.com
+DNS.2=example
+DNS.3=harbor.example.com
+EOF
+
+openssl x509 -req -sha512 -days 3650 \
+  -extfile v3.ext \
+  -CA ca.crt -CAkey ca.key -CAcreateserial \
+  -in harbor.example.com.csr \
+  -out harbor.example.com.crt
+
+# Step 3: Provide the Server Certificate and Key to Harbor
+# 将CA证书配置到docker环境，并重启 Docker
+mkdir -p /data/cert
+cp harbor.example.com.crt /data/cert/
+cp harbor.example.com.key /data/cert/
+
+openssl x509 -inform PEM -in harbor.example.com.crt -out harbor.example.com.cert
+mkdir -p /etc/docker/certs.d/harbor.example.com/
+cp harbor.example.com.cert /etc/docker/certs.d/harbor.example.com/
+cp harbor.example.com.key /etc/docker/certs.d/harbor.example.com/
+cp ca.crt /etc/docker/certs.d/harbor.example.com/
+
+systemctl restart docker
+
+# 使用说明
+# harbor.example.com 是搭建好后 Harbor 的访问地址
+# 后续可以使用下面命令进行替换
+# sed -i 's/harbor.example.com/your_domain/g' ./gen-certs.sh.example
+# 如 sed -i 's/harbor.example.com/harbor.xxxx.com/g' ./gen-certs.sh.example
