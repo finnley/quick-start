@@ -1,7 +1,7 @@
 {
   "centos7_altarch": {
     "enable": false,
-    "count": 5,
+    "count": 3,
     "ports": {
       "chaos-1": [
         "20000:10000",
@@ -28,12 +28,15 @@
       ],
       "chaos-2": [
         "~/workspace:/root/workspace"
+      ],
+      "chaos-3": [
+        "~/workspace:/root/workspace"
       ]
     }
   },
   "centos7_x86_64": {
     "enable": true,
-    "count": 5,
+    "count": 3,
     "ports": {
       "chaos-1": [
         "20000:10000",
