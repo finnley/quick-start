@@ -1,11 +1,11 @@
 x-templates:
   agent_centos7_x86_64: &agent_centos7_x86_64
-    image: reg.einscat.com:10010/library/centos7:x86_64
+    image: harbor.einscat.com:10011/library/centos7:x86_64
     privileged: true
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
     working_dir: /opt
@@ -13,12 +13,12 @@ x-templates:
       - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
   agent_centos7_altarch: &agent_centos7_altarch
-    image: reg.einscat.com:10010/library/centos7:altarch
+    image: harbor.einscat.com:10011/library/centos7:altarch
     privileged: true
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
     working_dir: /opt
@@ -32,25 +32,9 @@ x-templates:
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
-    working_dir: /opt
-    volumes:
-      - /shared:/shared
-      - /root/quick-usage/deploy:/tmp
-
-  agent_dmp_centos7: &agent_dmp_centos7
-    image: reg.actiontech.com/actiontech-dev/balm-runtime-centos7
-    privileged: true
-    stdin_open: true
-    tty: true
-    extra_hosts:
-      - "reg.actiontech.com:10.186.18.23"
-    cap_add:
-      - ALL
-    security_opt:
-      - seccomp:unconfined
     working_dir: /opt
     volumes:
       - /shared:/shared
@@ -62,7 +46,7 @@ x-templates:
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
     working_dir: /opt
@@ -76,7 +60,7 @@ x-templates:
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
     working_dir: /opt
@@ -90,7 +74,7 @@ x-templates:
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
     working_dir: /opt
@@ -105,7 +89,7 @@ x-templates:
     stdin_open: true
     tty: true
     extra_hosts:
-      - "docker-registry:10.186.18.20"
+      - "docker-registry:192.168.18.20"
     cap_add:
       - ALL
     working_dir: /opt
