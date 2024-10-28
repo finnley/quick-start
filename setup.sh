@@ -131,15 +131,6 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
         done
       fi
 
-      # 检查并处理卷映射
-      volumes=$(echo "${value}" | jq -r --arg idx "chaos-${container_index}" '.volumes[$idx] // [] | .[]')
-      if [[ -n "${volumes}" ]]; then
-        echo "    volumes:" >> ${COMPOSE_FILE}
-        for volume in ${volumes}; do
-          echo "      - \"${volume}\"" >> ${COMPOSE_FILE}
-        done
-      fi
-
 #      if [[ $i -eq 1 ]]; then
 #        ## 检查并处理端口映射
 #        if [[ -n "${ports}" ]]; then
@@ -150,13 +141,13 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
 #        fi
 #      fi
 #
-#      ## 检查并处理卷映射
-#      if [[ -n "${volumes}" ]]; then
-#        echo "    volumes:" >> ${COMPOSE_FILE}
-#        for volume in ${volumes}; do
-#          echo "      - \"${volume}\"" >> ${COMPOSE_FILE}
-#        done
-#      fi
+      ## 检查并处理卷映射
+      if [[ -n "${volumes}" ]]; then
+        echo "    volumes:" >> ${COMPOSE_FILE}
+        for volume in ${volumes}; do
+          echo "      - \"${volume}\"" >> ${COMPOSE_FILE}
+        done
+      fi
 
       if [[ "${HOST_ARCHITECTURE}" == "altarch2x64" ]] && [[ "$(to_lowercase ${key})" == "centos7_x64" ]]; then
         echo "    platform: linux/amd64" >> "${COMPOSE_FILE}"
