@@ -43,6 +43,8 @@ services:
       - "20001:18080"
       - "20002:27001"
       - "20003:3306"
+    volumes:
+      - "/opt/shared:/opt/shared"
     <<: *agent_centos7_x86_64
 
   chaos-2:
@@ -58,6 +60,8 @@ services:
       - "20005:18080"
       - "20006:27001"
       - "20007:3306"
+    volumes:
+      - "/opt/shared:/opt/shared"
     <<: *agent_centos7_x86_64
 
   chaos-3:
@@ -73,6 +77,8 @@ services:
       - "20009:18080"
       - "20010:27001"
       - "20011:3306"
+    volumes:
+      - "/opt/shared:/opt/shared"
     <<: *agent_centos7_x86_64
 
   chaos-4:
@@ -88,6 +94,8 @@ services:
       - "20013:18080"
       - "20014:27001"
       - "20015:3306"
+    volumes:
+      - "/opt/shared:/opt/shared"
     <<: *agent_ubuntu2004_amd64
 
   chaos-5:
@@ -103,6 +111,8 @@ services:
       - "20017:18080"
       - "20018:27001"
       - "20019:3306"
+    volumes:
+      - "/opt/shared:/opt/shared"
     <<: *agent_ubuntu2004_amd64
 
   chaos-6:
@@ -118,6 +128,8 @@ services:
       - "20021:18080"
       - "20022:27001"
       - "20023:3306"
+    volumes:
+      - "/opt/shared:/opt/shared"
     <<: *agent_ubuntu2004_amd64
 
 networks:

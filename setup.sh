@@ -103,7 +103,7 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   count=$(echo "${value}" | jq -r '.count')
 
 #  ports=$(echo "${value}" | jq -r '.ports[]')
-#  volumes=$(echo "${value}" | jq -r '.volumes[]')
+  volumes=$(echo "${value}" | jq -r '.volumes[]')
 
   ## mac 不支持该语法
   ## template="agent_${key,,}"

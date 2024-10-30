@@ -50,7 +50,7 @@
       ]
     },
     "volumes": [
-      "~/shared:/root/shared"
+      "/opt/shared:/opt/shared"
     ]
   },
   "ubuntu2004_amd64": {
@@ -77,7 +77,7 @@
       ]
     },
     "volumes": [
-      "~/shared:/root/shared"
+      "/opt/shared:/opt/shared"
     ]
   }
 }
