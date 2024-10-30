@@ -143,10 +143,16 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
 #
       ## 检查并处理卷映射
       if [[ -n "${volumes}" ]]; then
-        echo "    volumes:" >> ${COMPOSE_FILE}
-        for volume in ${volumes}; do
-          echo "      - \"${volume}\"" >> ${COMPOSE_FILE}
-        done
+        if [[ "${container_index}" == "1" ]]; then
+          echo "    volumes:" >> ${COMPOSE_FILE}
+          for volume in ${volumes}; do
+            echo "      - \"${volume}\"" >> ${COMPOSE_FILE}
+          done
+        fi
+#        echo "    volumes:" >> ${COMPOSE_FILE}
+#        for volume in ${volumes}; do
+#          echo "      - \"${volume}\"" >> ${COMPOSE_FILE}
+#        done
       fi
 
       if [[ "${HOST_ARCHITECTURE}" == "altarch2x64" ]] && [[ "$(to_lowercase ${key})" == "centos7_x64" ]]; then
