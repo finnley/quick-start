@@ -64,6 +64,36 @@ services:
       - "20011:3306"
     <<: *agent_centos7_altarch
 
+  chaos-4:
+    container_name: chaos-4
+    hostname: "chaos-4"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.4
+      chaos_net_2:
+        ipv4_address: 172.20.40.4
+    ports:
+      - "20012:10000"
+      - "20013:18080"
+      - "20014:27001"
+      - "20015:3306"
+    <<: *agent_centos7_altarch
+
+  chaos-5:
+    container_name: chaos-5
+    hostname: "chaos-5"
+    networks:
+      chaos_net:
+        ipv4_address: 172.20.30.5
+      chaos_net_2:
+        ipv4_address: 172.20.40.5
+    ports:
+      - "20016:10000"
+      - "20017:18080"
+      - "20018:27001"
+      - "20019:3306"
+    <<: *agent_centos7_altarch
+
 networks:
   chaos_net:
     driver: bridge

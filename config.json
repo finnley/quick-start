@@ -1,7 +1,7 @@
 {
   "centos7_altarch": {
     "enable": true,
-    "count": 3,
+    "count": 5,
     "ports": {
       "chaos-1": [
         "20000:10000",
