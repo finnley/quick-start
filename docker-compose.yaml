@@ -1,22 +1,9 @@
 version: '3'
 
 x-templates:
-  agent_centos7_x86_64:
-    &agent_centos7_x86_64
-    image: harbor.einscat.com:10011/library/centos7:x86_64
-    privileged: true
-    stdin_open: true
-    tty: true
-    extra_hosts:
-      - "docker-registry:192.168.18.20"
-    cap_add:
-      - ALL
-    working_dir: /opt
-    volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:ro
-  agent_ubuntu2004_amd64:
-    &agent_ubuntu2004_amd64
-    image: harbor.einscat.com:10011/library/ubuntu2004:amd64
+  agent_centos7_altarch:
+    &agent_centos7_altarch
+    image: harbor.einscat.com:10011/library/centos7:altarch
     privileged: true
     stdin_open: true
     tty: true
@@ -44,8 +31,8 @@ services:
       - "20002:27001"
       - "20003:3306"
     volumes:
-      - "/opt/shared:/opt/shared"
-    <<: *agent_centos7_x86_64
+      - "~/workspace:/root/workspace"
+    <<: *agent_centos7_altarch
 
   chaos-2:
     container_name: chaos-2
@@ -60,7 +47,7 @@ services:
       - "20005:18080"
       - "20006:27001"
       - "20007:3306"
-    <<: *agent_centos7_x86_64
+    <<: *agent_centos7_altarch
 
   chaos-3:
     container_name: chaos-3
@@ -75,52 +62,7 @@ services:
       - "20009:18080"
       - "20010:27001"
       - "20011:3306"
-    <<: *agent_centos7_x86_64
-
-  chaos-4:
-    container_name: chaos-4
-    hostname: "chaos-4"
-    networks:
-      chaos_net:
-        ipv4_address: 172.20.30.4
-      chaos_net_2:
-        ipv4_address: 172.20.40.4
-    ports:
-      - "20012:10000"
-      - "20013:18080"
-      - "20014:27001"
-      - "20015:3306"
-    <<: *agent_ubuntu2004_amd64
-
-  chaos-5:
-    container_name: chaos-5
-    hostname: "chaos-5"
-    networks:
-      chaos_net:
-        ipv4_address: 172.20.30.5
-      chaos_net_2:
-        ipv4_address: 172.20.40.5
-    ports:
-      - "20016:10000"
-      - "20017:18080"
-      - "20018:27001"
-      - "20019:3306"
-    <<: *agent_ubuntu2004_amd64
-
-  chaos-6:
-    container_name: chaos-6
-    hostname: "chaos-6"
-    networks:
-      chaos_net:
-        ipv4_address: 172.20.30.6
-      chaos_net_2:
-        ipv4_address: 172.20.40.6
-    ports:
-      - "20020:10000"
-      - "20021:18080"
-      - "20022:27001"
-      - "20023:3306"
-    <<: *agent_ubuntu2004_amd64
+    <<: *agent_centos7_altarch
 
 networks:
   chaos_net:
