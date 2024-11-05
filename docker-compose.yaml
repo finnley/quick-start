@@ -17,13 +17,13 @@ x-templates:
 
 services:
 
-  chaos-1:
-    container_name: chaos-1
-    hostname: "chaos-1"
+  vm-1:
+    container_name: vm-1
+    hostname: "vm-1"
     networks:
-      chaos_net:
+      vm_net:
         ipv4_address: 172.20.30.1
-      chaos_net_2:
+      vm_net_2:
         ipv4_address: 172.20.40.1
     ports:
       - "20000:10000"
@@ -35,13 +35,13 @@ services:
       - "~/workspace:/root/workspace"
     <<: *agent_centos8_aarch64
 
-  chaos-2:
-    container_name: chaos-2
-    hostname: "chaos-2"
+  vm-2:
+    container_name: vm-2
+    hostname: "vm-2"
     networks:
-      chaos_net:
+      vm_net:
         ipv4_address: 172.20.30.2
-      chaos_net_2:
+      vm_net_2:
         ipv4_address: 172.20.40.2
     ports:
       - "20004:10000"
@@ -50,13 +50,13 @@ services:
       - "20007:3306"
     <<: *agent_centos8_aarch64
 
-  chaos-3:
-    container_name: chaos-3
-    hostname: "chaos-3"
+  vm-3:
+    container_name: vm-3
+    hostname: "vm-3"
     networks:
-      chaos_net:
+      vm_net:
         ipv4_address: 172.20.30.3
-      chaos_net_2:
+      vm_net_2:
         ipv4_address: 172.20.40.3
     ports:
       - "20008:10000"
@@ -65,13 +65,13 @@ services:
       - "20011:3306"
     <<: *agent_centos8_aarch64
 
-  chaos-4:
-    container_name: chaos-4
-    hostname: "chaos-4"
+  vm-4:
+    container_name: vm-4
+    hostname: "vm-4"
     networks:
-      chaos_net:
+      vm_net:
         ipv4_address: 172.20.30.4
-      chaos_net_2:
+      vm_net_2:
         ipv4_address: 172.20.40.4
     ports:
       - "20012:10000"
@@ -80,13 +80,13 @@ services:
       - "20015:3306"
     <<: *agent_centos8_aarch64
 
-  chaos-5:
-    container_name: chaos-5
-    hostname: "chaos-5"
+  vm-5:
+    container_name: vm-5
+    hostname: "vm-5"
     networks:
-      chaos_net:
+      vm_net:
         ipv4_address: 172.20.30.5
-      chaos_net_2:
+      vm_net_2:
         ipv4_address: 172.20.40.5
     ports:
       - "20016:10000"
@@ -96,14 +96,14 @@ services:
     <<: *agent_centos8_aarch64
 
 networks:
-  chaos_net:
+  vm_net:
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 172.20.30.0/24
           gateway: 172.20.30.254
-  chaos_net_2:
+  vm_net_2:
     driver: bridge
     ipam:
       config:
