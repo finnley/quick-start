@@ -113,17 +113,17 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   if [[ "${enable}" == "true" ]]; then
     for ((i=1; i<=count; i++)); do
       echo "
-  chaos-${container_index}:
-    container_name: chaos-${container_index}
-    hostname: \"chaos-${container_index}\"
+  vm-${container_index}:
+    container_name: vm-${container_index}
+    hostname: \"vm-${container_index}\"
     networks:
-      chaos_net:
+      vm_net:
         ipv4_address: 172.20.30.${container_index}
-      chaos_net_2:
+      vm_net_2:
         ipv4_address: 172.20.40.${container_index}" >> ${COMPOSE_FILE}
 
       # 检查并处理端口映射
-      ports=$(echo "${value}" | jq -r --arg idx "chaos-${container_index}" '.ports[$idx] // [] | .[]')
+      ports=$(echo "${value}" | jq -r --arg idx "vm-${container_index}" '.ports[$idx] // [] | .[]')
       if [[ -n "${ports}" ]]; then
         echo "    ports:" >> ${COMPOSE_FILE}
         for port in ${ports}; do
@@ -164,17 +164,17 @@ jq -c 'to_entries[]' ${CONFIG_FILE} | while read -r entry; do
   fi
 done
 
-# 定义两个网络 chaos_net 和 chaos_net_2，每个网络分配不同的子网和网关
+# 定义两个网络 vm_net 和 vm_net_2，每个网络分配不同的子网和网关
 echo "
 networks:
-  chaos_net:
+  vm_net:
     driver: bridge
     ipam:
       driver: default
       config:
         - subnet: 172.20.30.0/24
           gateway: 172.20.30.254
-  chaos_net_2:
+  vm_net_2:
     driver: bridge
     ipam:
       config:

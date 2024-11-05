@@ -23,13 +23,6 @@ services:
     ports:
       - 3357:3306
 
-  redis:
-    image: bitnami/redis:latest
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    ports:
-      - 6379:6379
-
   nacos-standalone:
     container_name: nacos-standalone
     # platform: linux/amd64

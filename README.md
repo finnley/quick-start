@@ -1,5 +1,48 @@
 # quick start
 
+## 注意
+
+1. 为了保证mac下容器能够使用systemd，修改了mac下 `~/Library/Group\ Containers/group.com.docker/settings-store.json` 文件，将 `deprecatedCgroupv1` 参数设置为 `true`，默认是 `false`。
+
+## 其他
+
+
+# 通过将普通用户加入到sudoers，这样普通用户就可以通过 sudo 命令来暂时获得 root 权限
+RUN sed -i '/^root.*ALL=(ALL).*ALL/a\going\tALL=(ALL) \tALL' /etc/sudoers
+
+RUN tee -a $HOME/.bashrc <<-'EOF'
+
+if [ ! -d $HOME/workspace ]; then
+    mkdir -p $HOME/workspace
+fi
+
+# 用户特定环境
+# Basic envs
+export LANG="en_US.UTF-8"
+
+export WORKSPACE="$HOME/workspace"
+export PATH=$HOME/bin:$PATH
+
+# 默认入口目录
+cd $WORKSPACE
+EOF
+
+RUN bash
+
+# 配置 git
+RUN git config --global user.name "4343"
+RUN git config --global user.email "43@43.com"
+# 设置git保存用户名和密码
+RUN git config --global credential.helper store
+# 解决Git中“File too long”的错误
+RUN git config --global core.longpaths true
+RUN git config --global core.quotePath false
+RUN git lfs install --skip-repo
+
+# 配置Go
+RUN wget -P /tmp/ https://golang.org/dl/go1.17.1.linux-amd64.tar.gz
+
+```shell
 ## 功能
 
 1. 使用Docker快速搭建环境，方便快捷，不会影响本地环境。

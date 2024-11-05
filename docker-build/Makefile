@@ -1,4 +1,4 @@
-HOST_ARCHITECTURE=el7_altarch
+HOST_ARCHITECTURE=el8_aarch64
 
 default: build
 
@@ -10,5 +10,7 @@ el7_x86_64:
 ubuntu2004_amd64:
 	docker build -f Dockerfile.ubuntu2004.amd64 -t harbor.einscat.com:10011/library/ubuntu2004:amd64 .
 
-el7_altarch:
-	docker build -f Dockerfile.el7.altarch -t harbor.einscat.com:10011/library/centos7:altarch .
+el8_aarch64:
+	DOCKER_BUILDKIT=0 docker build -f Dockerfile.el8.aarch64 -t harbor.einscat.com:10011/library/centos8:aarch64 .
+
+# DOCKER_BUILDKIT=0

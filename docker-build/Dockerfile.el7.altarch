@@ -49,7 +49,7 @@ RUN cat > /etc/docker/daemon.json <<EOF
     ]
 }
 EOF
-# 启动容器后需要收容启动docker
+# 启动容器后需要手动启动docker
 # RUN systemctl daemon-reload && systemctl restart docker
 # RUN systemctl start docker
 
