@@ -14,6 +14,19 @@ x-templates:
     working_dir: /opt
     volumes:
       - /sys/fs/cgroup:/sys/fs/cgroup:rw
+  agent_ubuntu2004_amd64:
+    &agent_ubuntu2004_amd64
+    image: harbor.einscat.com:10011/library/ubuntu2004:amd64
+    privileged: true
+    stdin_open: true
+    tty: true
+    extra_hosts:
+      - "docker-registry:192.168.18.20"
+    cap_add:
+      - ALL
+    working_dir: /opt
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
 
 services:
 
@@ -94,6 +107,81 @@ services:
       - "20018:27001"
       - "20019:3306"
     <<: *agent_centos8_aarch64
+
+  vm-6:
+    container_name: vm-6
+    hostname: "vm-6"
+    networks:
+      vm_net:
+        ipv4_address: 172.20.30.6
+      vm_net_2:
+        ipv4_address: 172.20.40.6
+    ports:
+      - "20012:10000"
+      - "20013:18080"
+      - "20014:27001"
+      - "20015:3306"
+    <<: *agent_ubuntu2004_amd64
+
+  vm-7:
+    container_name: vm-7
+    hostname: "vm-7"
+    networks:
+      vm_net:
+        ipv4_address: 172.20.30.7
+      vm_net_2:
+        ipv4_address: 172.20.40.7
+    ports:
+      - "20016:10000"
+      - "20017:18080"
+      - "20018:27001"
+      - "20019:3306"
+    <<: *agent_ubuntu2004_amd64
+
+  vm-8:
+    container_name: vm-8
+    hostname: "vm-8"
+    networks:
+      vm_net:
+        ipv4_address: 172.20.30.8
+      vm_net_2:
+        ipv4_address: 172.20.40.8
+    ports:
+      - "20020:10000"
+      - "20021:18080"
+      - "20022:27001"
+      - "20023:3306"
+    <<: *agent_ubuntu2004_amd64
+
+  vm-9:
+    container_name: vm-9
+    hostname: "vm-9"
+    networks:
+      vm_net:
+        ipv4_address: 172.20.30.9
+      vm_net_2:
+        ipv4_address: 172.20.40.9
+    ports:
+      - "20020:10000"
+      - "20021:18080"
+      - "20022:27001"
+      - "20023:3306"
+    <<: *agent_ubuntu2004_amd64
+
+  vm-10:
+    container_name: vm-10
+    hostname: "vm-10"
+    networks:
+      vm_net:
+        ipv4_address: 172.20.30.10
+      vm_net_2:
+        ipv4_address: 172.20.40.10
+    ports:
+      - "20020:10000"
+      - "20021:18080"
+      - "20022:27001"
+      - "20023:3306"
+    <<: *agent_ubuntu2004_amd64
 
 networks:
   vm_net:
