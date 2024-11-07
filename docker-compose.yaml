@@ -1,9 +1,9 @@
 version: '3'
 
 x-templates:
-  agent_centos8_aarch64:
-    &agent_centos8_aarch64
-    image: harbor.einscat.com:10011/library/centos8:aarch64
+  agent_centos7_x86_64:
+    &agent_centos7_x86_64
+    image: harbor.einscat.com:10011/library/centos7:x86_64
     privileged: true
     stdin_open: true
     tty: true
@@ -13,7 +13,7 @@ x-templates:
       - ALL
     working_dir: /opt
     volumes:
-      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
   agent_ubuntu2004_amd64:
     &agent_ubuntu2004_amd64
     image: harbor.einscat.com:10011/library/ubuntu2004:amd64
@@ -43,10 +43,10 @@ services:
       - "20001:18080"
       - "20002:27001"
       - "20003:3306"
+      - "16379:6379"
     volumes:
-      - "/sys/fs/cgroup:/sys/fs/cgroup:rw"
-      - "~/workspace:/root/workspace"
-    <<: *agent_centos8_aarch64
+      - "/opt/shared:/opt/shared"
+    <<: *agent_centos7_x86_64
 
   vm-2:
     container_name: vm-2
@@ -61,7 +61,8 @@ services:
       - "20005:18080"
       - "20006:27001"
       - "20007:3306"
-    <<: *agent_centos8_aarch64
+      - "26379:6379"
+    <<: *agent_centos7_x86_64
 
   vm-3:
     container_name: vm-3
@@ -76,7 +77,8 @@ services:
       - "20009:18080"
       - "20010:27001"
       - "20011:3306"
-    <<: *agent_centos8_aarch64
+      - "36379:6379"
+    <<: *agent_centos7_x86_64
 
   vm-4:
     container_name: vm-4
@@ -87,11 +89,12 @@ services:
       vm_net_2:
         ipv4_address: 172.20.40.4
     ports:
-      - "20012:10000"
-      - "20013:18080"
-      - "20014:27001"
-      - "20015:3306"
-    <<: *agent_centos8_aarch64
+      - "20008:10000"
+      - "20009:18080"
+      - "20010:27001"
+      - "20011:3306"
+      - "46379:6379"
+    <<: *agent_centos7_x86_64
 
   vm-5:
     container_name: vm-5
@@ -102,11 +105,12 @@ services:
       vm_net_2:
         ipv4_address: 172.20.40.5
     ports:
-      - "20016:10000"
-      - "20017:18080"
-      - "20018:27001"
-      - "20019:3306"
-    <<: *agent_centos8_aarch64
+      - "20008:10000"
+      - "20009:18080"
+      - "20010:27001"
+      - "20011:3306"
+      - "56379:6379"
+    <<: *agent_centos7_x86_64
 
   vm-6:
     container_name: vm-6
@@ -162,10 +166,10 @@ services:
       vm_net_2:
         ipv4_address: 172.20.40.9
     ports:
-      - "20020:10000"
-      - "20021:18080"
-      - "20022:27001"
-      - "20023:3306"
+      - "20024:10000"
+      - "20025:18080"
+      - "20026:27001"
+      - "20027:3306"
     <<: *agent_ubuntu2004_amd64
 
   vm-10:
@@ -177,10 +181,10 @@ services:
       vm_net_2:
         ipv4_address: 172.20.40.10
     ports:
-      - "20020:10000"
-      - "20021:18080"
-      - "20022:27001"
-      - "20023:3306"
+      - "20028:10000"
+      - "20029:18080"
+      - "20030:27001"
+      - "20031:3306"
     <<: *agent_ubuntu2004_amd64
 
 networks:
